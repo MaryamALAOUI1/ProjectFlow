@@ -1,9 +1,10 @@
+using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using ProjectFlow.Infrastructure;
-using FluentValidation;
-using ProjectFlow.Application.Projects;
 using ProjectFlow.Api.Middleware; 
+using ProjectFlow.Application.Projects;
+using ProjectFlow.Application.Tasks;
+using ProjectFlow.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +21,8 @@ builder.Services.AddScoped<IValidator<CreateProjectCommand>, CreateProjectComman
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddScoped<IValidator<CreateProjectCommand>, CreateProjectCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateTaskCommand>, CreateTaskCommandValidator>();
 
 
 var app = builder.Build();
