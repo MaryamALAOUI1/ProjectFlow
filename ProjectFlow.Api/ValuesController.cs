@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ProjectFlow.Application.Projects;
+using ProjectFlow.Application.Projects; 
 using ProjectFlow.Domain;
 
 namespace ProjectFlow.Api.Controllers
@@ -17,12 +17,9 @@ namespace ProjectFlow.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Project>> CreateProject(string name)
+        public async Task<ActionResult<Project>> CreateProject(CreateProjectCommand command)
         {
-            var command = new CreateProjectCommand { Name = name };
-
             var createdProject = await _mediator.Send(command);
-
             return CreatedAtAction(nameof(GetProjectById), new { id = createdProject.Id }, createdProject);
         }
 
@@ -30,7 +27,6 @@ namespace ProjectFlow.Api.Controllers
         public async Task<ActionResult<Project>> GetProjectById(int id)
         {
             var query = new GetProjectByIdQuery { Id = id };
-
             var project = await _mediator.Send(query);
 
             if (project == null)
