@@ -26,13 +26,19 @@ namespace ProjectFlow.Api.Controllers
             return CreatedAtAction(nameof(GetProjectById), new { id = createdProject.Id }, createdProject);
         }
 
-       
         [HttpGet("{id}")]
         public async Task<ActionResult<Project>> GetProjectById(int id)
         {
-            
-            await Task.CompletedTask; 
-            return Ok($"Placeholder for project with ID: {id}");
+            var query = new GetProjectByIdQuery { Id = id };
+
+            var project = await _mediator.Send(query);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(project);
         }
     }
 }
