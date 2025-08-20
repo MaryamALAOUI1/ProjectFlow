@@ -36,5 +36,25 @@ namespace ProjectFlow.Api.Controllers
 
             return Ok(project);
         }
+        [HttpGet]
+        public async Task<ActionResult<List<Project>>> GetAllProjects()
+        {
+            var projects = await _mediator.Send(new GetAllProjectsQuery());
+            return Ok(projects);
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProject(int id, UpdateProjectCommand command)
+        {
+            if (id != command.Id) return BadRequest();
+            await _mediator.Send(command);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProject(int id)
+        {
+            await _mediator.Send(new DeleteProjectCommand { Id = id });
+            return NoContent();
+        }
     }
 }

@@ -23,5 +23,15 @@ namespace ProjectFlow.Api.Controllers
 
             return Ok(createdTask);
         }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTask(int id, UpdateTaskDetailsCommand command)
+        {
+            if (id != command.TaskId)
+            {
+                return BadRequest("ID in URL must match ID in request body.");
+            }
+            await _mediator.Send(command);
+            return NoContent(); 
+        }
     }
 }

@@ -5,6 +5,7 @@ using ProjectFlow.Api.Middleware;
 using ProjectFlow.Application.Projects;
 using ProjectFlow.Application.Tasks;
 using ProjectFlow.Infrastructure;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,14 +16,21 @@ builder.Services.AddDbContext<ProjectDbContext>(options =>
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(CreateProjectCommand).Assembly));
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 
+    });
 builder.Services.AddScoped<IValidator<CreateProjectCommand>, CreateProjectCommandValidator>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IValidator<CreateProjectCommand>, CreateProjectCommandValidator>();
-builder.Services.AddScoped<IValidator<CreateTaskCommand>, CreateTaskCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateProjectCommand>, UpdateProjectCommandValidator>();
+builder.Services.AddScoped<IValidator<CreateTaskCommand>, CreateTaskCommandValidator>(); 
+
 
 
 var app = builder.Build();

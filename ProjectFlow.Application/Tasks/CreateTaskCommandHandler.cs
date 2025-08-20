@@ -24,7 +24,7 @@ public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, TaskI
         {
             Title = request.Title,
             Description = request.Description,
-            Status = "To Do", 
+            Status = Domain.TaskStatus.ToDo,
             ProjectId = request.ProjectId 
         };
 
