@@ -1,0 +1,26 @@
+<p-card [styleClass]="'project-card-hover'">
+    <ng-template pTemplate="title">
+        {{ project.name }}
+    </ng-template>
+
+    <ul class="task-list-preview">
+        <li *ngFor="let task of project.tasks | slice:0:3">
+            <i class="pi pi-check-circle text-muted"></i> 
+            <span>{{ task.title }}</span>
+        </li>
+    </ul>
+
+    <div *ngIf="project.tasks.length > 3" class="more-tasks-indicator">
+        + {{ project.tasks.length - 3 }} more
+    </div>
+
+    <div *ngIf="project.tasks.length === 0" class="no-tasks-preview">
+        <p>No tasks yet.</p>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="card-footer">
+            <span>Created on: {{ project.creationDate | date:'mediumDate' }}</span>
+        </div>
+    </ng-template>
+</p-card>

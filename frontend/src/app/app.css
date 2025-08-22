@@ -1,0 +1,48 @@
+:host {
+    display: block;
+    background-color: var(--p-surface-ground); 
+    min-height: 100vh; 
+    color: var(--p-text-color); 
+}
+
+.app-container {
+   
+    max-width: 1400px; 
+    margin: 0 auto;
+}
+:host {
+  display: block;
+  background-color: var(--p-surface-ground);
+  min-height: 100vh;
+  color: var(--p-text-color);
+}
+
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo .pi {
+    font-size: 1.5rem;
+    color: var(--p-primary-color);
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}

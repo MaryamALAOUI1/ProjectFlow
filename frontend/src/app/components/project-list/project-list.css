@@ -1,0 +1,120 @@
+
+:host {
+    display: block;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo .pi {
+    font-size: 1.75rem;
+    color: var(--p-primary-color);
+}
+
+h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.search-bar {
+    flex-grow: 1;
+    margin: 0 3rem;
+    max-width: 450px;
+}
+
+.search-bar p-iconField,
+.search-bar input[pInputText] {
+    width: 100%;
+}
+
+
+
+.spinner-container { 
+    display: flex; 
+    justify-content: center; 
+    margin-top: 5rem; 
+}
+
+.project-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+    gap: 1.5rem; 
+}
+
+.new-project-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border: 2px dashed var(--p-surface-border);
+    border-radius: var(--p-card-border-radius);
+    color: var(--p-text-muted-color);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    min-height: 250px; 
+}
+
+.new-project-card:hover {
+    background-color: var(--p-surface-hover);
+    border-color: var(--p-primary-color);
+    color: var(--p-primary-color);
+}
+
+.new-project-card .pi { 
+    font-size: 2.5rem; 
+}
+
+
+.task-list-scrollable {
+    max-height: 40vh; 
+    overflow-y: auto; 
+    padding-right: 1rem; 
+    margin: -1.5rem; 
+    padding: 1.5rem;
+}
+
+.task-item-detailed {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--p-surface-border);
+}
+
+.no-tasks-detailed {
+    text-align: center;
+    padding: 2rem;
+    font-style: italic;
+    color: var(--p-text-muted-color);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.add-task-inline-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--p-surface-border);
+    padding-top: 1.5rem;
+}
+
+.add-task-inline-form input {
+    flex-grow: 1;
+}
