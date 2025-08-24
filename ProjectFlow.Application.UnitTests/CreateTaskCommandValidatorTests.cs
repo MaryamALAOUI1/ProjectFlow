@@ -41,7 +41,7 @@ public class CreateTaskCommandValidatorTests
     [Fact]
     public async Task Should_Not_Have_Error_When_ProjectId_Exists()
     {
-        var project = new Project { Name = "Existing Project" };
+        var project = Project.Create("Existing Project"); 
         _context.Projects.Add(project);
         await _context.SaveChangesAsync();
 
@@ -51,4 +51,5 @@ public class CreateTaskCommandValidatorTests
 
         result.ShouldNotHaveValidationErrorFor(x => x.ProjectId);
     }
+
 }

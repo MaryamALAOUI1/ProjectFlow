@@ -14,18 +14,11 @@ public class UpdateTaskDetailsCommandHandler : IRequestHandler<UpdateTaskDetails
     public async Task Handle(UpdateTaskDetailsCommand request, CancellationToken token)
     {
         var task = await _context.TaskItems.FirstOrDefaultAsync(t => t.Id == request.TaskId, token);
+        if (task == null) return;
 
-        if (task == null)
-        {
-            return;
-        }
-
-        task.Status = request.Status;
-        task.DueDate = request.DueDate;
-
-       
-        task.AddDomainEvent(new TaskUpdatedEvent(task));
+        task.UpdateStatus(request.Status);
 
         await _context.SaveChangesAsync(token);
     }
+
 }

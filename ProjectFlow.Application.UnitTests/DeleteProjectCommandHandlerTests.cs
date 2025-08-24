@@ -30,8 +30,7 @@ public class DeleteProjectCommandHandlerTests
     [Fact]
     public async Task Handle_GivenExistingProjectId_ShouldRemoveProjectFromDatabase()
     {
-        
-        var projectToDelete = new Project { Name = "Project to Delete" };
+        var projectToDelete = Project.Create("Project to Delete");  
         _context.Projects.Add(projectToDelete);
         await _context.SaveChangesAsync();
 
@@ -39,10 +38,10 @@ public class DeleteProjectCommandHandlerTests
 
         await _handler.Handle(command, CancellationToken.None);
 
-        
         var projectInDb = await _context.Projects.FindAsync(projectToDelete.Id);
         projectInDb.Should().BeNull();
     }
+
 
     [Fact]
     public async Task Handle_GivenNonExistentProjectId_ShouldDoNothing()

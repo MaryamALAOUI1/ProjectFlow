@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
 using ProjectFlow.Domain;
-using ProjectFlow.Domain.Events; 
+using ProjectFlow.Domain.Events;
 using ProjectFlow.Infrastructure;
 
 namespace ProjectFlow.Application.Tasks;
@@ -21,15 +21,12 @@ public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, TaskI
     {
         await _validator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var taskItem = new TaskItem
-        {
-            Title = request.Title,
-            Description = request.Description,
-            Status = Domain.TaskStatus.ToDo,
-            ProjectId = request.ProjectId
-        };
+        var taskItem = TaskItem.Create(
+            request.Title,
+            request.ProjectId,
+            request.Description
+        );
 
-        
         taskItem.AddDomainEvent(new TaskCreatedEvent(taskItem));
 
         _context.TaskItems.Add(taskItem);

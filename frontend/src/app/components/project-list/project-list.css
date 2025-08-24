@@ -1,48 +1,3 @@
-
-:host {
-    display: block;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 1.5rem 2rem;
-}
-
-.app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2.5rem;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.logo .pi {
-    font-size: 1.75rem;
-    color: var(--p-primary-color);
-}
-
-h1 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.search-bar {
-    flex-grow: 1;
-    margin: 0 3rem;
-    max-width: 450px;
-}
-
-.search-bar p-iconField,
-.search-bar input[pInputText] {
-    width: 100%;
-}
-
-
-
 .spinner-container { 
     display: flex; 
     justify-content: center; 
@@ -61,16 +16,17 @@ h1 {
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    border: 2px dashed var(--p-surface-border);
-    border-radius: var(--p-card-border-radius);
-    color: var(--p-text-muted-color);
+    border: 2px dashed #ced4da; /* A slightly darker dashed border */
+    border-radius: 8px; /* Consistent border-radius */
+    color: #6c757d; /* Muted text color */
     cursor: pointer;
     transition: all 0.2s ease-in-out;
     min-height: 250px; 
+    background-color: #ffffff;
 }
 
 .new-project-card:hover {
-    background-color: var(--p-surface-hover);
+    background-color: #f8f9fa;
     border-color: var(--p-primary-color);
     color: var(--p-primary-color);
 }
@@ -78,7 +34,6 @@ h1 {
 .new-project-card .pi { 
     font-size: 2.5rem; 
 }
-
 
 .task-list-scrollable {
     max-height: 40vh; 

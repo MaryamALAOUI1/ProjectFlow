@@ -1,7 +1,8 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using ProjectFlow.Domain.Events; 
+using ProjectFlow.Domain;
+using ProjectFlow.Domain.Events;
 using ProjectFlow.Infrastructure;
 
 namespace ProjectFlow.Application.Projects;
@@ -28,9 +29,8 @@ public class UpdateProjectCommandHandler : IRequestHandler<UpdateProjectCommand>
             return;
         }
 
-        project.Name = request.Name;
+        project.UpdateName(request.Name);
 
-        
         project.AddDomainEvent(new ProjectUpdatedEvent(project));
 
         await _context.SaveChangesAsync(token);

@@ -1,101 +1,63 @@
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<header class="app-header">
-  <div class="logo">
-    <i class="pi pi-th-large"></i>
-    <h1>ProjectFlow</h1>
-  </div>
-  <div class="search-bar">
-    <p-iconField iconPosition="left">
-      <p-inputIcon class="pi pi-search"></p-inputIcon>
-      <input 
-        pInputText 
-        [(ngModel)]="searchText" 
-        (ngModelChange)="onSearchChange()" 
-        placeholder="Search projects..." />
-    </p-iconField>
-  </div>
-  <p-button label="Add Project" icon="pi pi-plus" (click)="showAddProjectDialog()"></p-button>
-</header>
+<div *ngIf="isLoading" class="spinner-container">
+  <p-progressSpinner></p-progressSpinner>
+</div>
 
-<main>
-  <div *ngIf="isLoading" class="spinner-container">
-    <p-progressSpinner></p-progressSpinner>
+<div *ngIf="!isLoading" class="project-grid">
+  <app-project-card 
+    *ngFor="let project of filteredProjects" 
+    [project]="project"
+    (click)="navigateToProject(project)">
+  </app-project-card>
+  
+  <div class="new-project-card" (click)="showAddProjectDialog()">
+    <i class="pi pi-plus"></i>
+    <span>Add New Project</span>
   </div>
-
-  <div *ngIf="!isLoading" class="project-grid">
-    <app-project-card 
-      *ngFor="let project of filteredProjects" 
-      [project]="project"
-      (click)="showProjectDetails(project)">
-    </app-project-card>
-    
-    <div class="new-project-card" (click)="showAddProjectDialog()">
-      <i class="pi pi-plus"></i>
-      <span>Add New Project</span>
-    </div>
-  </div>
-</main>
+</div>
 
 <p-dialog 
-  *ngIf="selectedProject" 
-  [(visible)]="displayProjectDetailsDialog" 
-  [header]="selectedProject.name" 
+  header="Create New Project" 
+  [(visible)]="displayAddProjectDialog"
+  (onHide)="onDialogHide()"
   [modal]="true" 
-  [style]="{width: '50rem'}" 
+  [style]="{width: '30rem'}"
   [draggable]="false">
     
-    <div class="project-details-content">
-        <h4>Tasks</h4>
-        <div class="task-list-scrollable">
-            <div *ngFor="let task of selectedProject.tasks" class="task-item-detailed">
-                <span>{{ task.title }}</span>
-                <p-chip 
-                    [label]="task.status" 
-                    [styleClass]="'status-' + task.status.toLowerCase() + ' cursor-pointer'"
-                    (click)="onUpdateTaskStatus(task)">
-                </p-chip>
-            </div>
-            <div *ngIf="selectedProject.tasks.length === 0" class="no-tasks-detailed">
-                <p>This project has no tasks yet.</p>
-            </div>
-        </div>
-        
-        <div class="add-task-inline-form">
-            <input 
-                pInputText 
-                placeholder="Type a new task and press Enter" 
-                [(ngModel)]="newTaskTitle" 
-                (keyup.enter)="onAddTaskSubmit()" />
-            <p-button 
-                label="Add" 
-                icon="pi pi-plus"
-                (click)="onAddTaskSubmit()" 
-                [loading]="isSubmittingTask" 
-                [disabled]="!newTaskTitle">
-            </p-button>
-        </div>
+    <div class="field mt-3">
+        <label for="projectName" class="font-semibold w-full">Project Name</label>
+        <input 
+            id="projectName" 
+            pInputText 
+            class="w-full mt-2"
+            placeholder="e.g., Q3 Marketing Campaign"
+            [(ngModel)]="newProjectName" />
+    </div>
+
+    <div class="field mt-3">
+      <label for="projectDueDate" class="font-semibold w-full">Due Date</label>
+      <p-datePicker
+        [(ngModel)]="newProjectDueDate"
+        styleClass="w-full mt-2"
+        [showIcon]="true"
+        inputId="projectDueDate"
+        [appendTo]="'body'"> 
+      </p-datePicker>
     </div>
 
     <ng-template pTemplate="footer">
         <p-button 
-            label="Delete Project" 
-            icon="pi pi-trash" 
-            styleClass="p-button-danger"
-            (click)="onDeleteProject(selectedProject)">
+            label="Cancel" 
+            styleClass="p-button-text p-button-secondary" 
+            (click)="onDialogHide()">
         </p-button>
-    </ng-template>
-</p-dialog>
-
-<p-dialog header="Create New Project" [(visible)]="displayAddProjectDialog" [modal]="true" [style]="{width: '30rem'}">
-    <div class="field">
-        <label for="projectName">Project Name</label>
-        <input id="projectName" pInputText [(ngModel)]="newProjectName" (keyup.enter)="onAddProjectSubmit()" />
-        <small *ngIf="projectErrorMessage" class="p-error">{{ projectErrorMessage }}</small>
-    </div>
-    <ng-template pTemplate="footer">
-        <p-button label="Cancel" styleClass="p-button-text" (click)="displayAddProjectDialog=false"></p-button>
-        <p-button label="Create" (click)="onAddProjectSubmit()" [loading]="isSubmittingProject" [disabled]="!newProjectName"></p-button>
+        <p-button 
+            label="Create Project" 
+            (click)="onAddProjectSubmit()" 
+            [loading]="isSubmittingProject" 
+            [disabled]="!newProjectName.trim()">
+        </p-button>
     </ng-template>
 </p-dialog>

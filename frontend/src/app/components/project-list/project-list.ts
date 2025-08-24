@@ -1,19 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService, Project, Task } from '../../services/api';
+import { ApiService, Project } from '../../services/api';
 import { ProjectCardComponent } from '../project-card/project-card';
+import { UiStateService } from '../../services/ui-state';
+import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ToastModule } from 'primeng/toast';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ChipModule } from 'primeng/chip';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { DatePickerModule } from 'primeng/datepicker';
 
 @Component({
   selector: 'app-project-list',
@@ -21,35 +24,31 @@ import { InputIconModule } from 'primeng/inputicon';
   imports: [
     CommonModule, FormsModule, ProjectCardComponent,
     ButtonModule, DialogModule, InputTextModule, ProgressSpinnerModule,
-    ToastModule, ConfirmDialogModule, ChipModule, IconFieldModule, InputIconModule
+    ToastModule, ConfirmDialogModule, IconFieldModule, InputIconModule, DatePickerModule
   ],
   templateUrl: './project-list.html',
-  styleUrl: './project-list.css',
-  providers: [MessageService, ConfirmationService]
+  styleUrl: './project-list.css'
 })
-export class ProjectListComponent implements OnInit {
+export class ProjectListComponent implements OnInit, OnDestroy {
   
   private allProjects: Project[] = [];
   public filteredProjects: Project[] = [];
   public isLoading = true;
-  public searchText = '';
   
   displayAddProjectDialog = false;
+  private dialogSubscription: Subscription | undefined;
+  private searchSubscription: Subscription | undefined;
+  
   newProjectName = '';
+  newProjectDueDate: Date | null = null;
   isSubmittingProject = false;
   projectErrorMessage = '';
-
-  displayProjectDetailsDialog = false;
-  selectedProject: Project | null = null;
-  newTaskTitle = '';
-  isSubmittingTask = false;
-  
-  private statusCycle = ['ToDo', 'InProgress', 'InReview', 'Done'];
 
   constructor(
     private apiService: ApiService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private uiStateService: UiStateService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -58,35 +57,47 @@ export class ProjectListComponent implements OnInit {
       this.filteredProjects = this.allProjects;
       this.isLoading = false;
     });
+
+    this.dialogSubscription = this.uiStateService.addProjectDialogVisible$.subscribe(isVisible => {
+      if (isVisible) {
+        this.newProjectName = '';
+        this.newProjectDueDate = null;
+        this.projectErrorMessage = '';
+        this.isSubmittingProject = false;
+      }
+      this.displayAddProjectDialog = isVisible;
+    });
+
+    this.searchSubscription = this.uiStateService.searchText$.subscribe(searchTerm => {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase().trim();
+      if (!lowerCaseSearchTerm) {
+        this.filteredProjects = this.allProjects;
+      } else {
+        this.filteredProjects = this.allProjects.filter(project =>
+          project.name.toLowerCase().includes(lowerCaseSearchTerm)
+        );
+      }
+    });
   }
 
-  onSearchChange(): void {
-    const searchTerm = this.searchText.toLowerCase().trim();
-    if (!searchTerm) {
-      this.filteredProjects = this.allProjects;
-    } else {
-      this.filteredProjects = this.allProjects.filter(project =>
-        project.name.toLowerCase().includes(searchTerm)
-      );
-    }
+  ngOnDestroy(): void {
+    this.dialogSubscription?.unsubscribe();
+    this.searchSubscription?.unsubscribe();
   }
   
   showAddProjectDialog(): void {
-    this.newProjectName = '';
-    this.projectErrorMessage = '';
-    this.isSubmittingProject = false;
-    this.displayAddProjectDialog = true;
+    this.uiStateService.showAddProjectDialog();
   }
 
   onAddProjectSubmit(): void {
     if (!this.newProjectName.trim()) return;
     this.isSubmittingProject = true;
     this.projectErrorMessage = '';
-    this.apiService.createProject(this.newProjectName).subscribe({
+    this.apiService.createProject(this.newProjectName, this.newProjectDueDate).subscribe({
       next: (newProject) => {
         this.allProjects.push(newProject);
-        this.onSearchChange();
-        this.displayAddProjectDialog = false;
+        this.uiStateService.setSearchText('');
+        this.uiStateService.hideAddProjectDialog();
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Project created!' });
         this.isSubmittingProject = false;
       },
@@ -97,62 +108,11 @@ export class ProjectListComponent implements OnInit {
     });
   }
 
-  showProjectDetails(project: Project): void {
-    this.selectedProject = project;
-    this.newTaskTitle = '';
-    this.isSubmittingTask = false;
-    this.displayProjectDetailsDialog = true;
-  }
-  
-  onDeleteProject(project: Project): void {
-    this.confirmationService.confirm({
-      message: `Are you sure you want to delete "${project.name}"? This will also delete all of its tasks.`,
-      header: 'Delete Confirmation',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.apiService.deleteProject(project.id).subscribe({
-          next: () => {
-            this.allProjects = this.allProjects.filter(p => p.id !== project.id);
-            this.onSearchChange();
-            this.displayProjectDetailsDialog = false;
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Project deleted.' });
-          },
-          error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not delete project.' })
-        });
-      }
-    });
+  onDialogHide(): void {
+    this.uiStateService.hideAddProjectDialog();
   }
 
-  onUpdateTaskStatus(task: Task): void {
-    const currentIndex = this.statusCycle.indexOf(task.status);
-    const nextIndex = (currentIndex + 1) % this.statusCycle.length;
-    const newStatus = this.statusCycle[nextIndex];
-    const oldStatus = task.status;
-    
-    task.status = newStatus;
-
-    this.apiService.updateTask(task).subscribe({
-      error: () => {
-        task.status = oldStatus;
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not update task status.' });
-      }
-    });
-  }
-
-  onAddTaskSubmit(): void {
-    if (!this.newTaskTitle.trim() || !this.selectedProject) return;
-
-    this.isSubmittingTask = true;
-    this.apiService.createTask(this.newTaskTitle, this.selectedProject.id).subscribe({
-      next: (newTask) => {
-        this.selectedProject?.tasks.push(newTask);
-        this.newTaskTitle = '';
-        this.isSubmittingTask = false;
-      },
-      error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not add task.' });
-        this.isSubmittingTask = false;
-      }
-    });
+  navigateToProject(project: Project): void {
+    this.router.navigate(['/projects', project.id]);
   }
 }

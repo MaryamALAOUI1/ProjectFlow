@@ -25,11 +25,7 @@ public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand,
             throw new ValidationException(validationResult.Errors);
         }
 
-        var project = new Project
-        {
-            Name = request.Name,
-            CreationDate = DateTime.UtcNow
-        };
+        var project = Project.Create(request.Name);
 
         project.AddDomainEvent(new ProjectCreatedEvent(project));
         _context.Projects.Add(project);

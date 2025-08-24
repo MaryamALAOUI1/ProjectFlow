@@ -19,7 +19,7 @@ public class UpdateProjectCommandValidatorTests
         var options = new DbContextOptionsBuilder<ProjectDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
-        var publisher = new Mock<IPublisher>().Object; 
+        var publisher = new Mock<IPublisher>().Object;
         _context = new ProjectDbContext(options, publisher);
         _validator = new UpdateProjectCommandValidator(_context);
     }
@@ -27,9 +27,9 @@ public class UpdateProjectCommandValidatorTests
     [Fact]
     public async Task Should_Have_Error_When_Name_Is_Duplicate_Of_Another_Project()
     {
-        
-        var project1 = new Project { Name = "Project One" };
-        var project2 = new Project { Name = "Project Two" }; 
+        var project1 = Project.Create("Project One");
+        var project2 = Project.Create("Project Two");
+
         _context.Projects.AddRange(project1, project2);
         await _context.SaveChangesAsync();
 
@@ -42,15 +42,12 @@ public class UpdateProjectCommandValidatorTests
     [Fact]
     public async Task Should_Not_Have_Error_When_Name_Is_Unchanged()
     {
-        
-        var project1 = new Project { Name = "Project One" };
+        var project1 = Project.Create("Project One");
         _context.Projects.Add(project1);
         await _context.SaveChangesAsync();
 
         var command = new UpdateProjectCommand { Id = project1.Id, Name = "Project One" };
-
         var result = await _validator.TestValidateAsync(command);
-
         result.ShouldNotHaveValidationErrorFor(x => x);
     }
 }

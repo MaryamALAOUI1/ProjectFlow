@@ -1,0 +1,123 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div *ngIf="isLoading" class="spinner-container">
+  <p-progressSpinner></p-progressSpinner>
+</div>
+
+<div *ngIf="error" class="alert-error">
+  {{ error }}
+</div>
+
+<div *ngIf="project && !isLoading" class="project-detail-container">
+  <div class="page-header">
+    <div class="breadcrumbs">
+      <a routerLink="/projects">Projects</a>
+      <i class="pi pi-angle-right"></i>
+      <span>{{ project.name }}</span>
+    </div>
+    <div class="header-actions">
+      <p-button 
+        label="Delete Project" 
+        icon="pi pi-trash" 
+        styleClass="p-button-danger p-button-outlined"
+        (click)="confirmDeleteProject()">
+      </p-button>
+      <p-button label="Add Task" icon="pi pi-plus" (click)="showAddTaskDialog()"></p-button>
+    </div>
+  </div>
+
+  <div class="kanban-board">
+    <div class="kanban-column">
+      <div class="column-header">
+        <h3>To Do</h3>
+        <span class="task-count">{{ toDoTasks.length }}</span>
+      </div>
+      <div class="task-list">
+        <div *ngFor="let task of toDoTasks" class="task-card" (click)="cycleTaskStatus(task)">
+          <p>{{ task.title }}</p>
+          <div *ngIf="task.dueDate" class="task-due-date">
+            <i class="pi pi-calendar"></i>
+            <span>{{ task.dueDate | date:'mediumDate' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kanban-column">
+      <div class="column-header">
+        <h3>In Progress</h3>
+        <span class="task-count">{{ inProgressTasks.length }}</span>
+      </div>
+      <div class="task-list">
+        <div *ngFor="let task of inProgressTasks" class="task-card" (click)="cycleTaskStatus(task)">
+          <p>{{ task.title }}</p>
+          <div *ngIf="task.dueDate" class="task-due-date">
+            <i class="pi pi-calendar"></i>
+            <span>{{ task.dueDate | date:'mediumDate' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kanban-column">
+      <div class="column-header">
+        <h3>Done</h3>
+        <span class="task-count">{{ doneTasks.length }}</span>
+      </div>
+      <div class="task-list">
+        <div *ngFor="let task of doneTasks" class="task-card done">
+          <p>{{ task.title }}</p>
+          <div *ngIf="task.dueDate" class="task-due-date">
+            <i class="pi pi-calendar"></i>
+            <span>{{ task.dueDate | date:'mediumDate' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog 
+  *ngIf="project"
+  header="Add New Task to {{ project.name }}" 
+  [(visible)]="displayAddTaskDialog" 
+  [modal]="true" 
+  [style]="{width: '30rem'}" 
+  [draggable]="false">
+    
+    <div class="field mt-3">
+        <label for="taskTitle" class="font-semibold w-full">Task Title</label>
+        <input 
+            id="taskTitle" 
+            pInputText 
+            class="w-full mt-2"
+            placeholder="e.g., Design the login mockup"
+            [(ngModel)]="newTaskTitle" />
+    </div>
+
+    <div class="field mt-3">
+      <label for="taskDueDate" class="font-semibold w-full">Due Date</label>
+      <p-datePicker 
+        [(ngModel)]="newTaskDueDate" 
+        styleClass="w-full mt-2"
+        [showIcon]="true"
+        inputId="taskDueDate"
+        [appendTo]="'body'">
+      </p-datePicker>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button 
+            label="Cancel" 
+            styleClass="p-button-text p-button-secondary" 
+            (click)="displayAddTaskDialog=false">
+        </p-button>
+        <p-button 
+            label="Add Task" 
+            (click)="onAddTaskSubmit()" 
+            [loading]="isSubmittingTask" 
+            [disabled]="!newTaskTitle.trim()">
+        </p-button>
+    </ng-template>
+</p-dialog>
