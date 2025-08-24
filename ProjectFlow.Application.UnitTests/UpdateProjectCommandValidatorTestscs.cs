@@ -1,5 +1,7 @@
 ﻿using FluentValidation.TestHelper;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using ProjectFlow.Application.Projects;
 using ProjectFlow.Domain;
 using ProjectFlow.Infrastructure;
@@ -17,7 +19,8 @@ public class UpdateProjectCommandValidatorTests
         var options = new DbContextOptionsBuilder<ProjectDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
-        _context = new ProjectDbContext(options);
+        var publisher = new Mock<IPublisher>().Object; 
+        _context = new ProjectDbContext(options, publisher);
         _validator = new UpdateProjectCommandValidator(_context);
     }
 
